@@ -31,7 +31,7 @@ app.get("/", async(req,res)=>{
     const response_gapi = await sheets.spreadsheets.values.get({
         auth,
         spreadsheetId: SPREADSHEET_ID,
-        range: 'Sheet1!A2:B4',
+        range: 'Sheet1!A2:B20',
     });
 
 

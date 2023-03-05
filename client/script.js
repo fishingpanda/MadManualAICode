@@ -4,67 +4,67 @@ import user from './assets/user.svg'
 const form = document.querySelector('form');
 const chatContainer = document.querySelector('#chat_container');
 
-let loadInterval;
-
-function loader(element) {
-  element.textContent = ''
-
-  loadInterval = setInterval(() => {
-      // Update the text content of the loading indicator
-      element.textContent += '.';
-
-      // If the loading indicator has reached three dots, reset it
-      if (element.textContent === '....') {
-          element.textContent = '';
-      }
-  }, 300);
-}
-
-function typeText(element, text) {
-  let index = 0
-
-  let interval = setInterval(() => {
-      if (index < text.length) {
-          element.innerHTML += text.charAt(index)
-          index++
-      } else {
-          clearInterval(interval)
-      }
-  }, 20)
-}
-
-
-// generate unique ID for each message div of bot
+let loadInterval; 
+    
+//show a different color for user vs bot
+function chatStripe(isAi, value, uniqueId) {
+    return (
+        `
+        <div class="wrapper ${isAi && 'ai'}">
+            <div class="chat">
+                <div class="profile">
+                    <img 
+                      src=${isAi ? bot : user} 
+                      alt="${isAi ? 'bot' : 'user'}" 
+                    />
+                </div>
+                <div class="message" id=${uniqueId}>${value}</div>
+            </div>
+        </div>
+    `
+    )
+  }
+  // generate unique ID for each message div of bot
 // necessary for typing text effect for that specific reply
 // without unique ID, typing text will work on every element
 function generateUniqueId() {
-  const timestamp = Date.now();
-  const randomNumber = Math.random();
-  const hexadecimalString = randomNumber.toString(16);
+    const timestamp = Date.now();
+    const randomNumber = Math.random();
+    const hexadecimalString = randomNumber.toString(16);
+  
+    return `id-${timestamp}-${hexadecimalString}`;
+  }
 
-  return `id-${timestamp}-${hexadecimalString}`;
-}
+  
+function loader(element) {
+    element.textContent = ''
+  
+    loadInterval = setInterval(() => {
+        // Update the text content of the loading indicator
+        element.textContent += '.';
+  
+        // If the loading indicator has reached three dots, reset it
+        if (element.textContent === '....') {
+            element.textContent = '';
+        }
+    }, 300);
+  }
+  
+  function typeText(element, text) {
+    let index = 0
+  
+    let interval = setInterval(() => {
+        if (index < text.length) {
+            element.innerHTML += text.charAt(index)
+            index++
+        } else {
+            clearInterval(interval)
+        }
+    }, 20)
+  }
+   
 
-//show a different color for user vs bot
-function chatStripe(isAi, value, uniqueId) {
-  return (
-      `
-      <div class="wrapper ${isAi && 'ai'}">
-          <div class="chat">
-              <div class="profile">
-                  <img 
-                    src=${isAi ? bot : user} 
-                    alt="${isAi ? 'bot' : 'user'}" 
-                  />
-              </div>
-              <div class="message" id=${uniqueId}>${value}</div>
-          </div>
-      </div>
-  `
-  )
-}
-
-const handleSubmit = async (e) => {
+const handleSubmit = async (e) => { 
   e.preventDefault()  //prevent reloading the browser
 
   const data = new FormData(form) //get data from form
@@ -88,7 +88,7 @@ const handleSubmit = async (e) => {
   // messageDiv.innerHTML = "..."
   loader(messageDiv)
 
-  const response = await fetch('http://localhost:5000/', {
+  const response = await fetch('http://localhost:5000/test', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
@@ -98,14 +98,16 @@ const handleSubmit = async (e) => {
       })
   })
 
+  console.log(data);
   clearInterval(loadInterval)
   messageDiv.innerHTML = " "
 
   if (response.ok) {
       const data = await response.json();
-      const parsedData = data.bot.trim() // trims any trailing spaces/'\n' 
-
-      typeText(messageDiv, parsedData)
+      alert(data.bot);
+      const parsedData = data.bot //.trim() // trims any trailing spaces/'\n' 
+      chatContainer.innerHTML += parsedData
+      //typeText(messageDiv, parsedData)
   } else {
       const err = await response.text()
 

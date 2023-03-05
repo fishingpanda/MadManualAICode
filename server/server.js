@@ -7,13 +7,14 @@ dotenv.config()
 
 console.log(process.env.OPENAI_API_KEY)
 const configuration = new Configuration({
+  organization:"org-ZYJS1fhL0H81wchixAjHXDvk",
   apiKey: process.env.OPENAI_API_KEY,
 });
 
 const openai = new OpenAIApi(configuration);
 
 const app = express()
-app.use(cors())   //allows cross orgin requests - 
+app.use(cors())   //allows cross orgin requests -
 app.use(express.json())
 
 app.get('/', async (req, res) => {
@@ -23,22 +24,28 @@ app.get('/', async (req, res) => {
 })
 
 //accepts payload
-app.post('/', async (req, res) => {
+app.post('/test', async (req, res) => {
   try {
-    const prompt = req.body.prompt;
 
-    const response = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: `${prompt}`,
-      temperature: 0, // Higher values means the model will take more risks.
-      max_tokens: 3000, // The maximum number of tokens to generate in the completion. Most models have a context length of 2048 tokens (except for the newest models, which support 4096).
-      top_p: 1, // alternative to sampling with temperature, called nucleus sampling
-      frequency_penalty: 0.5, // Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.
-      presence_penalty: 0, // Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.
+// const engines = await openai.listEngines();
+
+// console.log(engines.data)
+
+    const response = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo-0301",
+      messages:[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Who won the cricket world cup  in 2019?"}, 
+        {"role": "system", "content": "England won cricket world cup in 2019"},
+        {"role": "user", "content": "Who was the man of the match?"}, 
+      ],
     });
 
+    //console.log(response.data.choices);
+    console.log(response.data.choices[0].message.content);
+
     res.status(200).send({
-      bot: response.data.choices[0].text
+      bot: response.data.choices[0].message.content
     });
 
   } catch (error) {
@@ -46,5 +53,27 @@ app.post('/', async (req, res) => {
     res.status(500).send(error || 'Something went wrong');
   }
 })
+
+// //accepts payload
+// app.post('/', async (req, res) => {
+//   try {
+//     const prompt = req.body.prompt;
+//     console.log('received payload - ' + prompt);
+//     const response = await openai.createChatCompletion({
+//       model: "gpt-3.5-turbo",
+//       messages: [{role:"user",content:"Hello World!"}],
+//     });
+
+//     console.log(response.data.choices[0].message)
+
+//     res.status(200).send({
+//       bot: response.data.choices[0].message
+//     });
+
+//   } catch (error) {
+//     console.error(error)
+//     res.status(500).send(error || 'Something went wrong');
+//   }
+// })
 
 app.listen(5000, () => console.log('AI server started on http://localhost:5000'))

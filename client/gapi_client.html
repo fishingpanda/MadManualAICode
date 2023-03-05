@@ -11,12 +11,16 @@
     
   
     <div id="app">
-      <div id="json_container">ehere</div>
       <form>
-        <select id="myDropdown"></select>
-
+        <select id="ddManufacturer">
+            <option selected> &nbsp;&nbsp; Select Manufacturer  &nbsp;&nbsp;</option> 
+        </select>
+        <select id="ddApplianceType">
+            <option selected>&nbsp;&nbsp; Select Appliance Type &nbsp;&nbsp;</option> 
+        </select>
         <button type="submit"><img src="assets/send.svg"/></button>
       </form>
+      <div id="json_container">ehere</div>
        
     </div>
     <script  src="gapi_client_script.js"></script>
